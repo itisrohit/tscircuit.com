@@ -719,18 +719,16 @@ const initializer = combine(databaseSchema.parse({}), (set, get) => ({
 
       // Update package files if code/dts/js changed
       const updatedFiles = [...state.packageFiles]
-      const packageFiles = updatedFiles.filter(
-        (file) => file.package_release_id === packageRelease.package_release_id,
-      )
 
       if (updates.code !== undefined) {
-        const codeFileIndex = packageFiles.findIndex(
+        const codeFileIndex = updatedFiles.findIndex(
           (file) =>
-            file.file_path === "index.tsx" || file.file_path === "index.ts",
+            file.package_release_id === packageRelease.package_release_id &&
+            (file.file_path === "index.tsx" || file.file_path === "index.ts"),
         )
         if (codeFileIndex >= 0) {
           updatedFiles[codeFileIndex] = {
-            ...packageFiles[codeFileIndex],
+            ...updatedFiles[codeFileIndex],
             content_text: updates.code,
             created_at: currentTime,
           }
@@ -746,12 +744,14 @@ const initializer = combine(databaseSchema.parse({}), (set, get) => ({
       }
 
       if (updates.dts !== undefined) {
-        const dtsFileIndex = packageFiles.findIndex(
-          (file) => file.file_path === "/dist/index.d.ts",
+        const dtsFileIndex = updatedFiles.findIndex(
+          (file) =>
+            file.package_release_id === packageRelease.package_release_id &&
+            file.file_path === "/dist/index.d.ts",
         )
         if (dtsFileIndex >= 0) {
           updatedFiles[dtsFileIndex] = {
-            ...packageFiles[dtsFileIndex],
+            ...updatedFiles[dtsFileIndex],
             content_text: updates.dts,
             created_at: currentTime,
           }
@@ -767,12 +767,14 @@ const initializer = combine(databaseSchema.parse({}), (set, get) => ({
       }
 
       if (updates.compiled_js !== undefined) {
-        const jsFileIndex = packageFiles.findIndex(
-          (file) => file.file_path === "/dist/index.js",
+        const jsFileIndex = updatedFiles.findIndex(
+          (file) =>
+            file.package_release_id === packageRelease.package_release_id &&
+            file.file_path === "/dist/index.js",
         )
         if (jsFileIndex >= 0) {
           updatedFiles[jsFileIndex] = {
-            ...packageFiles[jsFileIndex],
+            ...updatedFiles[jsFileIndex],
             content_text: updates.compiled_js,
             created_at: currentTime,
           }
@@ -789,12 +791,14 @@ const initializer = combine(databaseSchema.parse({}), (set, get) => ({
 
       // Update circuit JSON if provided
       if (updates.circuit_json !== undefined) {
-        const circuitFileIndex = packageFiles.findIndex(
-          (file) => file.file_path === "/dist/circuit.json",
+        const circuitFileIndex = updatedFiles.findIndex(
+          (file) =>
+            file.package_release_id === packageRelease.package_release_id &&
+            file.file_path === "/dist/circuit.json",
         )
         if (circuitFileIndex >= 0) {
           updatedFiles[circuitFileIndex] = {
-            ...packageFiles[circuitFileIndex],
+            ...updatedFiles[circuitFileIndex],
             content_text: JSON.stringify(updates.circuit_json),
             created_at: new Date().toISOString(),
           }
